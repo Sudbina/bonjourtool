@@ -18,9 +18,14 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
+    icon: __dirname + 'Icon/Appicon.icns',
+    center: true,
     height: 563,
     useContentSize: true,
-    width: 1000
+    width: 600,
+    minWidth: 600,
+    maxWidth: 600,
+    maximizable: false
   })
 
   mainWindow.loadURL(winURL)
