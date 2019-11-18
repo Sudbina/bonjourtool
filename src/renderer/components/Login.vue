@@ -4,25 +4,34 @@
           <a-tag>{{this.discoveredDevices.length}} Devices Found</a-tag>
       </div>
         <div style="position: absolute; bottom: 0px; display: flex; align-items: center; width: 100%; padding: 10px; background: white; box-shadow: 0px -3px 13px 0px rgba(0,0,0,0.15);">
-            <a-button v-if="!scanning" type="primary" style="font-weight: bold;" @click="handleDiscovery('')">{{this.discoveredDevices.length === 0 ? 'Scan' : 'Scan Again'}}</a-button>
+            <a-button v-if="!scanning" type="primary" style="font-weight: bold;" @click="handleDiscovery('myactionreplay-http')">{{this.discoveredDevices.length === 0 ? 'Scan' : 'Scan Again'}}</a-button>
             <a-button v-else type="danger" icon="loading" style="font-weight: bold;" @click="stopScan">Stop</a-button>
-            <a-dropdown disabled>
+            <a-dropdown>
                 <a-menu slot="overlay">
                     <a-menu-item @click="handleViewChange('name')" key="1">By Name</a-menu-item>
                     <a-menu-item @click="handleViewChange('site')" key="2">By Site</a-menu-item>
+                    <a-menu-item @click="handleViewChange('serial')" key="3">By Serial</a-menu-item>
                 </a-menu>
-                <a-button disabled style="margin-left: 8px"> View By <a-icon type="down" /> </a-button>
+                <a-button style="margin-left: 8px"> View By <a-icon type="down" /> </a-button>
             </a-dropdown>
             <!-- <a-input-search style="width: 30%; margin-left: auto;" placeholder="input search text" @search="handleDiscovery" enterButton /> -->
         </div>
         <div style="width: 100%; padding: 10px;" >
             <a-collapse accordion>
-               <a-collapse-panel v-anime="{ duration: 5000, opacity: 1, left: 50, delay: $anime.stagger(8000)}" v-for="device in discoveredDevices" :header="viewBy === 'name' ? device.name : device.txt.sitename" v-bind:key="device.name +''+ device.port ">
+               <a-collapse-panel v-for="device in discoveredDevices" :header="renderName(device)" v-bind:key="device.name +''+ device.port ">
                    <div class="result-inner" style="display: flex; align-items: left; flex-wrap: wrap;">
-                       <a-tag v-for="add in device.addresses" color="purple" v-bind:key="add.id" style="margin-right: 5px; margin-bottom: 5px;"><strong>Address: </strong>{{add}}</a-tag>
-                       <a-tag color="orange" style="margin-right: 5px; margin-bottom: 5px"><strong>Port: </strong>{{device.port}}</a-tag>
-                       <a-tag color="cyan" style="margin-right: 5px; margin-bottom: 5px;"><strong>Host: </strong>{{device.host}}</a-tag>
-                       <a-tag v-for="(val, key) in device.txt" style="margin-right: 5px; margin-bottom: 5px" color="blue" v-bind:key="val.id"><strong style="text-transform: capitalize;">{{key}}: </strong>{{val}}</a-tag>
+                       <a-tag id="tt" v-clipboard:copy="add" v-clipboard:success="handleCopyAttrib" v-for="add in device.addresses" color="purple" v-bind:key="add.id" style="margin-right: 5px; margin-bottom: 5px;">
+                            <strong>Address: </strong>{{add}}
+                        </a-tag>
+                       <a-tag color="orange" style="margin-right: 5px; margin-bottom: 5px">
+                           <strong>Port: </strong>{{device.port}}
+                        </a-tag>
+                       <a-tag color="cyan" style="margin-right: 5px; margin-bottom: 5px;">
+                           <strong>Host: </strong>{{device.host}}
+                        </a-tag>
+                       <a-tag v-for="(val, key) in device.txt" style="margin-right: 5px; margin-bottom: 5px" color="blue" v-bind:key="val.id">
+                           <strong style="text-transform: capitalize;">{{key}}: </strong>{{val}}
+                        </a-tag>
                    </div>
                </a-collapse-panel>
             </a-collapse>
@@ -35,9 +44,9 @@
 import Bonjour from 'bonjour';
 import Browser from 'bonjour/lib/browser';
 import VueAnime from 'vue-animejs';
-
+import anime from 'animejs';
 import _ from 'lodash';
-
+import tippy from 'tippy.js';
 let local = new Bonjour()
 export default {
     data() {
@@ -45,10 +54,27 @@ export default {
             discoveredDevices: [],
             viewBy: "name",
             scanning: false,
-            logs: true
+            logs: true,
+            keyframes: [
+                {opacity: 0},
+                {opacity: 1}
+            ]
         } 
     },
     methods: {
+        handleCopyAttrib(val) {
+            const el = document.getElementById('tt');
+            tippy('#tt', {
+                content: 'Copied',
+                placement: 'bottom',
+                animation: 'scale',
+                trigger: 'click'
+            });
+            const instance = el._tippy;
+            setTimeout(function() {
+                instance.hide();
+            }, 1500)
+        },
         handleDiscovery(bonjourType) {
             let tempDevices = [];
             local.find({type: bonjourType}, (device) => { //discover mdns servers on the network
@@ -59,20 +85,36 @@ export default {
             this.scanning = true; //let user know things are happening
             this.discoveredDevices = tempDevices; // merge device into state array
         },
+        renderName(device) {
+            switch(this.viewBy){
+                case "name":
+                    return device.name;
+                    break;
+                case "site": 
+                    return device.txt.sitename;
+                    break;
+                case "serial":
+                    return device.txt.piserial;
+                    break;
+            }
+        },
         handleViewChange(viewby) {
             switch(viewby){
                 case "name": 
-                    this.viewBy = "name";
+                    this.viewBy = "name"; 
                     break;
                 case "site":
                     this.viewBy = "site";
+                    break;
+                case "serial":
+                    this.viewBy = "serial";
                     break;
             }
         },
         stopScan() {
             if(this.scanning) {
                 this.scanning = false;
-                local.stop(); //destroy this instance of Bonjour
+                local.destroy(); //destroy this instance of Bonjour
                 local = new Bonjour() //create new instance of Bonjour
             }
         },
@@ -106,5 +148,12 @@ p {
 }
 .ant-collapse-content > .ant-collapse-content-box {
     padding: 5px !important; //antd override
+}
+#menu-solutions-menu {
+    flex-direction: column !important;
+}
+#menu-solutions-menu li[id^="menu-item"] {
+    padding: 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.5);
 }
 </style>
