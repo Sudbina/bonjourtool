@@ -1,7 +1,9 @@
 <template>
-  <div style="display: flex; height: 91%; overflow: scroll; max-width: 100%; background: #efefef">
+  <div style="display: flex; height: 100%; overflow: scroll; max-width: 100%; background: #efefef">
+      <div v-if="scanning" style="position: absolute; bottom: 0px; display: flex; align-items: center; width: 100%; padding: 10px; background: white;">
+          <a-tag>{{this.discoveredDevices.length}} Devices Found</a-tag>
+      </div>
         <div style="position: absolute; bottom: 0px; display: flex; align-items: center; width: 100%; padding: 10px; background: white; box-shadow: 0px -3px 13px 0px rgba(0,0,0,0.15);">
-            
             <a-button v-if="!scanning" type="primary" style="font-weight: bold;" @click="handleDiscovery('')">{{this.discoveredDevices.length === 0 ? 'Scan' : 'Scan Again'}}</a-button>
             <a-button v-else type="danger" icon="loading" style="font-weight: bold;" @click="stopScan">Stop</a-button>
             <a-dropdown disabled>
@@ -43,14 +45,10 @@ export default {
             discoveredDevices: [],
             viewBy: "name",
             scanning: false,
-            logs: false
+            logs: true
         } 
     },
     methods: {
-        bruh(opt1, opt2) {
-            console.log(Object.keys(opt1))
-            // return this.$lodash.findKey(opt1, [opt2]);
-        },
         handleDiscovery(bonjourType) {
             let tempDevices = [];
             local.find({type: bonjourType}, (device) => { //discover mdns servers on the network
@@ -64,10 +62,10 @@ export default {
         handleViewChange(viewby) {
             switch(viewby){
                 case "name": 
-                    this.viewBy = "name"
+                    this.viewBy = "name";
                     break;
                 case "site":
-                    this.viewBy = "site"
+                    this.viewBy = "site";
                     break;
             }
         },
@@ -108,11 +106,5 @@ p {
 }
 .ant-collapse-content > .ant-collapse-content-box {
     padding: 5px !important; //antd override
-}
-.slide-fade-enter-active {
-  transition: all .3s ease;
-}
-.slide-fade-leave-active {
-  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
 </style>

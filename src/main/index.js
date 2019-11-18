@@ -20,11 +20,13 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     icon: __dirname + 'Icon/Appicon.icns',
     center: true,
-    height: 563,
+    height: 650,
+    minHeight: 650,
+    maxHeight: 650,
     useContentSize: true,
-    width: 600,
-    minWidth: 600,
-    maxWidth: 600,
+    width: 500,
+    minWidth: 500,
+    maxWidth: 500,
     maximizable: false
   })
 
