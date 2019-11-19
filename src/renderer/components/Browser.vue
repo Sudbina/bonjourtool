@@ -1,16 +1,26 @@
 <template>
   <div class="ebonjour-wrapper">
         <div class="navigator">
-            <a-button v-if="!scanning" type="primary" style="font-weight: bold;" @click="handleDiscovery('http')">{{this.discoveredDevices.length === 0 ? 'Scan' : 'Scan Again'}}</a-button>
-            <a-button v-else type="danger" icon="loading" style="font-weight: bold;" @mouseover="statusText = 'Stop'" @mouseleave="statusText = 'Scanning'" @click="stopScan">{{this.statusText}}</a-button>
-            <a-dropdown disabled>
+            <a-select
+            showSearch
+            addonBefore="Service"
+            placeholder="Select a Service Type"
+            optionFilterProp="children"
+            style="width: 200px; "
+            @change="handleChange"
+            :filterOption="filterOption"
+            >   
+                <a-select-option v-for="item in serviceTypes" :key="item.name" :value="item.name">{{item.name}}</a-select-option>
+            </a-select>
+            <a-button v-if="!scanning" :disabled="selectedServiceType === null" type="primary" style="font-weight: bold; margin-left: 5px;" @click="handleDiscovery('http')">{{this.discoveredDevices.length === 0 ? 'Scan' : 'Scan Again'}}</a-button>
+            <a-button v-else type="danger" icon="loading" style="font-weight: bold; margin-left: 5px;" @click="stopScan">Stop</a-button>
+            <!-- <a-dropdown disabled>
                 <a-menu slot="overlay">
                     <a-menu-item @click="handleViewChange('name')" key="1">By Name</a-menu-item>
                     <a-menu-item @click="handleViewChange('site')" key="2">By Site</a-menu-item>
                 </a-menu>
                 <a-button disabled style="margin-left: 8px"> View By <a-icon type="down" /> </a-button>
-            </a-dropdown>
-            <!-- <a-input-search style="width: 30%; margin-left: auto;" placeholder="input search text" @search="handleDiscovery" enterButton /> -->
+            </a-dropdown> -->
         </div>
         <div class="result-container">
             <a-collapse accordion>
@@ -41,6 +51,7 @@ import Bonjour from 'bonjour';
 import Browser from 'bonjour/lib/browser';
 import VueAnime from 'vue-animejs';
 import _ from 'lodash';
+import serviceTypes from './Browser/mdnsServiceTypes';
 
 let local = new Bonjour();
 
@@ -52,16 +63,23 @@ export default {
             scanning: false,
             logs: true,
             statusText: 'Scanning',
+            serviceTypes: serviceTypes,
+            selectedServiceType: null,
             listAnimation: { duration: 2000, opacity: 1 }
         } 
     },
     methods: {
+        handleChange(value) {
+            console.log(`selected ${value}`);
+            this.selectedServiceType = value;
+        },
         handleCopySuccess() {
+            console.log(serviceTypes)
             this.$notification.open({message: 'Copied to clipboard', placement: "bottomRight", duration: 1.5}) //user copy to clipboard feedback
         },
-        handleDiscovery(bonjourType) {
+        handleDiscovery() {
             let tempDevices = [];
-            local.find({type: bonjourType}, (device) => { //discover mdns servers on the network
+            local.find({type: this.selectedServiceType}, (device) => { //discover mdns servers on the network
                 if(this.logs) console.log("[M][Found a device]:", device);
                 tempDevices.push(device); // add device to temp array
                 if(this.logs) console.log("[M][Added device to array]:", tempDevices);
@@ -85,6 +103,11 @@ export default {
                 local.destroy(); //destroy this instance of Bonjour
                 local = new Bonjour(); //create new instance of Bonjour
             }
+        },
+        filterOption(input, option) {
+            return (
+                option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            );
         },
         handleSearch(v) {
             console.log(v);
