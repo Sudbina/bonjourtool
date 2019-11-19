@@ -1,9 +1,9 @@
 {
-  "name": "sudbina-electronic-vue",
-  "version": "0.0.1",
+  "name": "ebonjour-tool",
+  "version": "0.0.2",
   "author": "Jack <jack@onebigcircle.co.uk>",
-  "description": "An electron-vue project",
-  "license": null,
+  "description": "A .local service discovery tool using mdns browsers and an friendly interface",
+  "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
@@ -17,8 +17,8 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "electric-bonjour",
-    "appId": "com.sudbina.electronicvue",
+    "productName": "ebonjour-tool",
+    "appId": "com.sudbina.ebonjourtool",
     "directories": {
       "output": "build"
     },
@@ -58,6 +58,7 @@
     "mdns-js": "^1.0.3",
     "vue": "^2.5.16",
     "vue-animejs": "^2.1.1",
+    "vue-clipboard2": "^0.3.1",
     "vue-electron": "^1.0.6",
     "vue-lodash": "^2.0.2",
     "vue-router": "^3.0.1",
