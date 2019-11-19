@@ -57,7 +57,7 @@ export default {
     },
     methods: {
         handleCopySuccess() {
-            this.$notification.open({message: 'Copied to clipboard', placement: "bottomRight", duration: 100}) //user copy to clipboard feedback
+            this.$notification.open({message: 'Copied to clipboard', placement: "bottomRight", duration: 1.5}) //user copy to clipboard feedback
         },
         handleDiscovery(bonjourType) {
             let tempDevices = [];
