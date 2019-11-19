@@ -1,4 +1,4 @@
-# electron bonjour discovery tool
+# Bonjour Tool
 
 ![Screenshot](/images/example.png)
 
