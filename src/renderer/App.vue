@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: 'sudbina-electronic-vue'
+    name: 'ebonjour-tool'
   }
 </script>
 
