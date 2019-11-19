@@ -1,4 +1,4 @@
-# Bonjour Tool
+# eBonjour Tool
 
 ![Screenshot](/images/example.png)
 
