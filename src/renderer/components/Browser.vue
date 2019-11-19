@@ -12,7 +12,7 @@
             >   
                 <a-select-option v-for="item in serviceTypes" :key="item.name" :value="item.name">{{item.name}}</a-select-option>
             </a-select>
-            <a-button v-if="!scanning" :disabled="selectedServiceType === null" type="primary" style="font-weight: bold; margin-left: 5px;" @click="handleDiscovery('http')">{{this.discoveredDevices.length === 0 ? 'Scan' : 'Scan Again'}}</a-button>
+            <a-button v-if="!scanning" :disabled="selectedServiceType === null" type="primary" style="font-weight: bold; margin-left: 5px;" @click="handleDiscovery('http')">Scan</a-button>
             <a-button v-else type="danger" icon="loading" style="font-weight: bold; margin-left: 5px;" @click="stopScan">Stop</a-button>
             <!-- <a-dropdown disabled>
                 <a-menu slot="overlay">
@@ -26,16 +26,16 @@
             <a-collapse accordion>
                <a-collapse-panel v-anime="listAnimation" v-for="device in discoveredDevices" :header="viewBy === 'name' ? device.name : device.txt.sitename" v-bind:key="device.name +''+ device.port ">
                    <div class="result-inner">
-                       <a-tag class="result-attribute" v-clipboard:copy="add" v-clipboard:success="handleCopySuccess" color="purple" v-for="add in device.addresses" v-bind:key="add.id">
+                       <a-tag class="result-attribute" color="purple" v-clipboard:copy="add" v-clipboard:success="handleCopySuccess" v-for="add in device.addresses" v-bind:key="add.id">
                            <strong>Address: </strong>{{add}}
                         </a-tag>
-                       <a-tag class="result-attribute" color="orange">
+                       <a-tag class="result-attribute" color="orange" v-clipboard:copy="device.port" v-clipboard:success="handleCopySuccess">
                            <strong>Port: </strong>{{device.port}}
                         </a-tag>
-                       <a-tag class="result-attribute" color="cyan">
+                       <a-tag class="result-attribute" color="cyan" v-clipboard:copy="device.host" v-clipboard:success="handleCopySuccess">
                            <strong>Host: </strong>{{device.host}}
                         </a-tag>
-                       <a-tag class="result-attribute" color="blue" v-for="(val, key) in device.txt" v-bind:key="val.id">
+                       <a-tag class="result-attribute" color="blue" v-clipboard:copy="val" v-clipboard:success="handleCopySuccess" v-for="(val, key) in device.txt" v-bind:key="val.id">
                            <strong style="text-transform: capitalize;">{{key}}: </strong>{{val}}
                         </a-tag>
                    </div>
@@ -72,6 +72,7 @@ export default {
         handleChange(value) {
             console.log(`selected ${value}`);
             this.selectedServiceType = value;
+            this.stopScan();
         },
         handleCopySuccess() {
             console.log(serviceTypes)
@@ -80,11 +81,11 @@ export default {
         handleDiscovery() {
             let tempDevices = [];
             local.find({type: this.selectedServiceType}, (device) => { //discover mdns servers on the network
+                this.scanning = true; //let user know things are happening
                 if(this.logs) console.log("[M][Found a device]:", device);
                 tempDevices.push(device); // add device to temp array
                 if(this.logs) console.log("[M][Added device to array]:", tempDevices);
             })
-            this.scanning = true; //let user know things are happening
             this.discoveredDevices = tempDevices; // merge device into state array
         },
         handleViewChange(viewby) {
@@ -102,6 +103,10 @@ export default {
                 this.scanning = false; //keep user informed
                 local.destroy(); //destroy this instance of Bonjour
                 local = new Bonjour(); //create new instance of Bonjour
+            }
+            else {
+                local.destroy();
+                local = new Bonjour();
             }
         },
         filterOption(input, option) {
