@@ -3,6 +3,7 @@ import axios from 'axios';
 import Antd from 'ant-design-vue';
 import VueAnime from 'vue-animejs';
 import VueClipboard from 'vue-clipboard2';
+import VueCookies from 'vue-cookies';
 
 import App from './App';
 import router from './router';
@@ -12,6 +13,7 @@ import 'ant-design-vue/dist/antd.css';
 Vue.use(Antd);
 Vue.use(VueAnime);
 Vue.use(VueClipboard);
+Vue.use(VueCookies);
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios

@@ -4,11 +4,11 @@
       <a-select
         showSearch
         addonBefore="Service"
-        placeholder="Select a Service Type"
         optionFilterProp="children"
         style="width: 200px; "
         @change="handleChange"
         :filterOption="filterOption"
+        :defaultValue="this.$cookies.get('serviceTypePref')"
       >
         <a-select-option
           v-for="item in serviceTypes"
@@ -104,14 +104,18 @@ export default {
       logs: true,
       statusText: "Scanning",
       serviceTypes: serviceTypes,
-      selectedServiceType: null,
+      selectedServiceType: this.$cookies.get('serviceTypePref') ? this.$cookies.get('serviceTypePref') : null,
       listAnimation: { duration: 2000, opacity: 1 }
     };
+  },
+  mounted () {
+      if(this.logs) console.log(this.$cookies.get('serviceTypePref'));
   },
   methods: {
     handleChange(value) {
       console.log(`selected ${value}`);
       this.selectedServiceType = value;
+      this.$cookies.set('serviceTypePref', value);
       this.stopScan();
     },
     handleCopySuccess() {
@@ -131,6 +135,8 @@ export default {
         if (this.logs) console.log("[M][Added device to array]:", tempDevices);
       });
       this.discoveredDevices = tempDevices; // merge device into state array
+      this.$cookies.set('devices', this.discoveredDevices)
+      console.log(this.$cookies.get('devices'))
     },
     handleViewChange(viewby) {
       switch (viewby) {
