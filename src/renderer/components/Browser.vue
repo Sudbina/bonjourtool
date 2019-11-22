@@ -1,5 +1,5 @@
 <template>
-  <div class="ebonjour-wrapper">
+  <div class="ebonjour-wrapper" v-anime="{opacity: 1, duration: 1000}">
     <div class="navigator">
       <a-select
         showSearch
@@ -32,6 +32,7 @@
                 </a-menu>
                 <a-button disabled style="margin-left: 8px"> View By <a-icon type="down" /> </a-button>
             </a-dropdown> -->
+    <a-button type="primary" style="margin-left: auto;" @click="handleNavigation('settings')" icon="setting"></a-button>
     </div>
     <div class="result-container">
       <a-collapse accordion>
@@ -89,7 +90,6 @@
 <script>
 import Bonjour from "bonjour";
 import Browser from "bonjour/lib/browser";
-import VueAnime from "vue-animejs";
 import _ from "lodash";
 import serviceTypes from "./Browser/mdnsServiceTypes";
 
@@ -110,8 +110,12 @@ export default {
   },
   mounted () {
       if(this.logs) console.log(this.$cookies.get('serviceTypePref'));
+    //   analytics.logEvent("app_start", {date: new Date()});
   },
   methods: {
+    handleNavigation(screen) {
+        this.$router.replace(screen);
+    },
     handleChange(value) {
       console.log(`selected ${value}`);
       this.selectedServiceType = value;
@@ -221,7 +225,6 @@ p {
 .ant-collapse-header[aria-expanded="true"] {
   background: #1890ff;
   color: white !important;
-  font-weight: bold;
 }
 .ant-collapse-content > .ant-collapse-content-box {
   padding: 5px !important; //antd override
@@ -243,4 +246,14 @@ p {
     top: 9px !important;
   }
 }
+#menu-solutions-menu {
+    display: flex;
+    flex-direction: column;
+}
+#menu-solutions-menu >*::after{
+    padding: 10px 0px;
+    font-size: 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.5);
+}
+
 </style>

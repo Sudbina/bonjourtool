@@ -4,7 +4,6 @@ import Antd from 'ant-design-vue';
 import VueAnime from 'vue-animejs';
 import VueClipboard from 'vue-clipboard2';
 import VueCookies from 'vue-cookies';
-
 import App from './App';
 import router from './router';
 import store from './store';

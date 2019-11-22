@@ -7,8 +7,13 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'login',
+      name: 'Browser',
       component: require('@/components/Browser').default
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: require('@/components/Settings').default
     },
     {
       path: '*',
