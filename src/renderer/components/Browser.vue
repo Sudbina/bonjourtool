@@ -1,6 +1,6 @@
 <template>
-  <div class="ebonjour-wrapper" v-anime="{opacity: 1, duration: 1000}">
-    <div class="navigator">
+  <div class="ebonjour-wrapper" :style="`background: ${themeBackground}; color: ${themeText}`" v-anime="{ opacity: 1, duration: 1000 }">
+    <div class="navigator" :style="`background: ${themeNavigatorBackground}`">
       <a-select
         showSearch
         addonBefore="Service"
@@ -19,20 +19,17 @@
       </a-select>
       <a-button
         :disabled="selectedServiceType === null"
-        type="primary"
+        :type="themeButtonType"
         style="font-weight: bold; margin-left: 5px;"
-        @click="handleDiscovery('http')"
+        @click="handleDiscovery(selectedServiceType)"
         >Scan</a-button
       >
-      <!-- <a-button v-else type="danger" icon="loading" style="font-weight: bold; margin-left: 5px;" @click="stopScan">Stop</a-button> -->
-      <!-- <a-dropdown disabled>
-                <a-menu slot="overlay">
-                    <a-menu-item @click="handleViewChange('name')" key="1">By Name</a-menu-item>
-                    <a-menu-item @click="handleViewChange('site')" key="2">By Site</a-menu-item>
-                </a-menu>
-                <a-button disabled style="margin-left: 8px"> View By <a-icon type="down" /> </a-button>
-            </a-dropdown> -->
-    <a-button type="primary" style="margin-left: auto;" @click="handleNavigation('settings')" icon="setting"></a-button>
+      <a-button
+        :type="themeButtonType"
+        style="margin-left: auto;"
+        @click="handleNavigation('settings')"
+        icon="setting"
+      ></a-button>
     </div>
     <div class="result-container">
       <a-collapse accordion>
@@ -88,8 +85,8 @@
 </template>
 
 <script>
+import store from '../store';
 import Bonjour from "bonjour";
-import Browser from "bonjour/lib/browser";
 import _ from "lodash";
 import serviceTypes from "./Browser/mdnsServiceTypes";
 
@@ -104,53 +101,85 @@ export default {
       logs: true,
       statusText: "Scanning",
       serviceTypes: serviceTypes,
-      selectedServiceType: this.$cookies.get('serviceTypePref') ? this.$cookies.get('serviceTypePref') : null,
-      listAnimation: { duration: 2000, opacity: 1 }
+      listAnimation: { duration: 2000, opacity: 1 },
+      selectedServiceType: this.$cookies.get("serviceTypePref")
+                            ? this.$cookies.get("serviceTypePref")
+                            : "",
     };
   },
-  mounted () {
-      if(this.logs) console.log(this.$cookies.get('serviceTypePref'));
-    //   analytics.logEvent("app_start", {date: new Date()});
+  mounted() {
+    if (this.logs) console.log(this.$cookies.get("serviceTypePref"));
+    //   analytics.logEvent("app_start", {date: new Date()}); BRUH why can't I use firebase analytics with electron
+  },
+  computed: {
+    themeBackground() {
+      switch (store.state.userThemeSelection) {
+        default:
+        case "light":
+          return "#FFFFFF";
+        case "dark":
+          return "#1b1b1b";
+      }
+    },
+    themeText() {
+      switch (store.state.userThemeSelection) {
+        default:
+        case "light":
+          return "#1b1b1b";
+        case "dark":
+          return "#FFFFFF";
+      }
+    },
+    themeNavigatorBackground() {
+      switch (store.state.userThemeSelection) {
+        default:
+        case "light":
+          return "#FFFFFF";
+        case "dark":
+          return "#232323";
+      }
+    },
+    themeButtonType() {
+      switch (store.state.userThemeSelection) {
+        default:
+        case "light":
+          return "primary";
+        case "dark":
+          return "ghost";
+      }
+    }
   },
   methods: {
     handleNavigation(screen) {
-        this.$router.replace(screen);
+      this.$router.push(screen);
     },
     handleChange(value) {
       console.log(`selected ${value}`);
       this.selectedServiceType = value;
-      this.$cookies.set('serviceTypePref', value);
+      this.$cookies.set("serviceTypePref", value);
       this.stopScan();
     },
     handleCopySuccess() {
       console.log(serviceTypes);
-      this.$notification.open({ //user copy to clipboard feedback
+      this.$notification.open({
+        //user copy to clipboard feedback
         message: "Copied to clipboard",
         placement: "bottomRight",
         duration: 1.5
-      }); 
+      });
     },
     handleDiscovery() {
       let tempDevices = [];
-      local.find({ type: this.selectedServiceType }, device => { //discover mdns servers on the network
+      local.find({ type: this.selectedServiceType }, device => {
+        //discover mdns servers on the network
         this.scanning = true; //let user know things are happening
         if (this.logs) console.log("[M][Found a device]:", device);
         tempDevices.push(device); // add device to temp array
         if (this.logs) console.log("[M][Added device to array]:", tempDevices);
       });
       this.discoveredDevices = tempDevices; // merge device into state array
-      this.$cookies.set('devices', this.discoveredDevices)
-      console.log(this.$cookies.get('devices'))
-    },
-    handleViewChange(viewby) {
-      switch (viewby) {
-        case "name":
-          this.viewBy = "name";
-          break;
-        case "site":
-          this.viewBy = "site";
-          break;
-      }
+      this.$cookies.set("devices", this.discoveredDevices);
+      console.log(this.$cookies.get("devices"));
     },
     stopScan() {
       if (this.scanning) {
@@ -168,10 +197,10 @@ export default {
           .toLowerCase()
           .indexOf(input.toLowerCase()) >= 0
       );
-    },
-    handleSearch(v) {
-      console.log(v);
     }
+    // handleSearch(v) {
+    //   console.log(v);
+    // }
   }
 };
 </script>
@@ -193,6 +222,7 @@ p {
   overflow: scroll;
   max-width: 100%;
   background: #efefef;
+  transition: 0.1s ease;
 }
 .navigator {
   position: absolute;
@@ -247,13 +277,12 @@ p {
   }
 }
 #menu-solutions-menu {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
-#menu-solutions-menu >*::after{
-    padding: 10px 0px;
-    font-size: 20px;
-    border-bottom: 1px solid rgba(0,0,0,0.5);
+#menu-solutions-menu > *::after {
+  padding: 10px 0px;
+  font-size: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
 }
-
 </style>
