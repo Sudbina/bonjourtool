@@ -1,8 +1,8 @@
 <template>
   <div class="ebonjour-wrapper" :style="`background: ${themeBackground}; color: ${themeText}`" v-anime="{ opacity: 1, duration: 1000 }">
-    <div class="navigator">
+    <div class="navigator" :style="`background: ${themeNavigatorBackground};`">
       <a-button
-        type="primary"
+        :type="themeButtonType"
         style="font-weight: bold;"
         @click="handleNavigation('browser')"
         >Back</a-button
@@ -51,6 +51,24 @@ export default {
         case "dark":
           return '#FFFFFF';
       }
+    },
+    themeNavigatorBackground() {
+      switch(store.state.userThemeSelection){
+        default:
+        case "light":
+          return '#FFFFFF';
+        case "dark":
+          return '#232323';
+      }
+    },
+    themeButtonType() {
+      switch(store.state.userThemeSelection){
+        default:
+        case "light":
+          return "primary";
+        case "dark":
+          return "ghost";
+      }
     }
   },
   methods: {
@@ -68,12 +86,7 @@ export default {
 };
 </script>
 
-<style
-  v-if="
-    state.userThemeSelection === null || state.userThemeSelection === 'light'
-  "
-  lang="scss"
->
+<style lang="scss">
 p {
   margin: 0px !important;
 }
@@ -83,7 +96,7 @@ p {
   overflow: scroll;
   max-width: 100%;
   background: #efefef;
-  transition: 0.3s ease-in-out;
+  transition: 0.1s ease;
 }
 .navigator {
   position: absolute;
@@ -101,7 +114,7 @@ p {
   .settings-inner {
     display: flex;
     flex-direction: column;
-    margin-left: 15px;
+    padding: 10px;
     .settings-option {
       width: 200px;
       display: flex;
