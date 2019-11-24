@@ -35,10 +35,11 @@
       <a-collapse accordion>
         <a-collapse-panel
           v-anime="listAnimation"
-          v-for="device in discoveredDevices"
-          :header="viewBy === 'name' ? device.name : device.txt.sitename"
-          v-bind:key="device.name + '' + device.port"
+          v-for="(device, key) in discoveredDevices"
+          :header="device.name + '(' + device.port + ')'"
+          v-bind:key="'ebonjour-resultitem-' + key"
         >
+          <p slot="header">Test</p>
           <div class="result-inner">
             <a-tag
               class="result-attribute"
@@ -102,6 +103,7 @@ export default {
       logs: true,
       statusText: "Scanning",
       serviceTypes: serviceTypes,
+      testArr: this.$cookies.get("savedDevices") ? this.$cookies.get("savedDevices") : [],
       listAnimation: { duration: 2000, opacity: 1 },
       selectedServiceType: this.$cookies.get("serviceTypePref")
                             ? this.$cookies.get("serviceTypePref")
@@ -152,7 +154,10 @@ export default {
   },
   methods: {
     handleRememberDevice(device) {
-      console.log(device);
+      this.testArr.devices.push(device);
+      this.$cookies.set("savedDevices", this.testArr);
+      console.log("DEVICES", this.$cookies.get("savedDevices"));
+      store.dispatch('updateSavedDevices', this.$cookies.get("savedDevices"))
     },
     handleNavigation(screen) {
       this.$router.push(screen);

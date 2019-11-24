@@ -18,6 +18,15 @@
             <a-select-option value="dark">Dark</a-select-option>
           </a-select>
         </div>
+        <div class="settings-option">
+          <p>Remembered Devices:</p>
+          <a-select :defaultValue="savedDevices.devices[0].name" @change="handleOpenSD">
+            <a-select-option v-for="(device, index) in savedDevices.devices" :key="index" :value="device.name">{{device.name}}</a-select-option>
+          </a-select>
+          <div v-if="viewingSavedDevice" style="display: flex; flex-direction: column; align-items: left;">
+            <p>{{viewingSavedDevice}}</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -28,7 +37,10 @@ import store from "../store";
 
 export default {
   data() {
-    return {};
+    return {
+      savedDevices: store.state.userSavedDevices,
+      viewingSavedDevice: null,
+    };
   },
   mounted() {
     console.log(this.$cookies.get("userThemePref"));
@@ -77,10 +89,15 @@ export default {
     },
     handleTheme(theme) {
       console.log("[VX] CHANGE THEME: ", theme);
-      store.dispatch("handleUserThemeChange", theme).then((success, error) => {
+      store.dispatch("handleUserThemeChange", theme).then(() => {
           this.$cookies.set("userThemePref", theme);
           console.log(this.$cookies.get("userThemePref"));
       });
+    },
+    handleOpenSD(device) {
+      console.log(device);
+      this.viewingSavedDevice = device;
+      console.log(this.$lodash.filter(this.savedDevices.devices, this.viewingSavedDevice))
     }
   }
 };
@@ -118,8 +135,8 @@ p {
     .settings-option {
       width: 200px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: flex-start;
       margin: 5px 0px; //tb lr
     }
   }
