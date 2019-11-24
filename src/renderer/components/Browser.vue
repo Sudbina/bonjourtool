@@ -77,6 +77,7 @@
               <strong style="text-transform: capitalize;">{{ key }}: </strong
               >{{ val }}
             </a-tag>
+            <a-button type="primary" size="small" style="font-weight: bold;" @click="handleRememberDevice(device)">Remember</a-button>
           </div>
         </a-collapse-panel>
       </a-collapse>
@@ -150,6 +151,9 @@ export default {
     }
   },
   methods: {
+    handleRememberDevice(device) {
+      console.log(device);
+    },
     handleNavigation(screen) {
       this.$router.push(screen);
     },
