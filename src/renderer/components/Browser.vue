@@ -94,6 +94,9 @@
         </a-collapse-panel>
       </a-collapse>
     </div>
+    <a-modal title="test" v-model="showFirstLaunchDialog" @ok="handleFirstLaunchConfirm">
+        <p>Test</p>
+    </a-modal>
   </div>
 </template>
 
@@ -102,6 +105,7 @@ import store from "../store";
 import Bonjour from "bonjour";
 import _ from "lodash";
 import serviceTypes from "./Browser/mdnsServiceTypes";
+import * as Sentry from '@sentry/browser';
 
 let local = new Bonjour();
 
@@ -120,12 +124,17 @@ export default {
       listAnimation: { duration: 2000, opacity: 1 },
       selectedServiceType: this.$cookies.get("serviceTypePref")
         ? this.$cookies.get("serviceTypePref")
-        : ""
+        : "",
+      isFirstLaunch: this.$cookies.get("isFirstLaunch") ? this.$cookies.get("isFirstLaunch") : true,
+      showFirstLaunchDialog: false
     };
   },
   mounted() {
     if (this.logs) console.log(this.$cookies.get("serviceTypePref"));
-    //   analytics.logEvent("app_start", {date: new Date()}); BRUH why can't I use firebase analytics with electron
+    console.log(this.$cookies.get('isFirstLaunch'))
+    // if(this.isFirstLaunch) {
+    //     this.showFirstLaunchDialog = true; 
+    // }
   },
   computed: {
     themeBackground() {
@@ -166,6 +175,16 @@ export default {
     }
   },
   methods: {
+    handleFirstLaunchConfirm() {
+        let uniqid = this.$uniqid('ebonjourUser-');
+        this.$cookies.set('UUID', uniqid);
+        store.dispatch("FIRST_LAUNCH_UUID", this.$cookies.get('UUID')).then(() => {
+            this.$cookies.set('isFirstLaunch', false);
+            this.showFirstLaunchDialog = false;
+            console.log('UUID SET: ', this.$cookies.get('UUID'));
+            Sentry.captureMessage(this.$cookies.get('UUID'), 'debug')
+        });
+    },
     handleRememberDevice(device) {
       if (!this.$lodash.includes(this.savedDevices.devices, device)) {
         this.savedDevices.devices.push(device);

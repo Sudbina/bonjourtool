@@ -11,6 +11,7 @@ export default new Vuex.Store({
   state: {
     userThemeSelection: VueCookies.get('userThemePref') ? VueCookies.get('userThemePref') : null,
     userSavedDevices: VueCookies.get('savedDevices') ? VueCookies.get('savedDevices') : {},
+    userUUID: VueCookies.get('UUID') ? VueCookies.get('UUID') : ''
   },
   mutations: {
     handleUserThemeChange(state, value) {
@@ -18,6 +19,9 @@ export default new Vuex.Store({
     },
     updateSavedDevices(state, value) {
       state.userSavedDevices = value;
+    },
+    FIRST_LAUNCH_UUID(state, uuid) {
+      state.userUUID = uuid;
     }
   },
   actions: {
@@ -26,6 +30,9 @@ export default new Vuex.Store({
     },
     updateSavedDevices(context, devices) {
       context.commit('updateSavedDevices', devices)
+    },
+    FIRST_LAUNCH_UUID(context, uuid) {
+      context.commit('FIRST_LAUNCH_UUID', uuid)
     }
   },
   modules,

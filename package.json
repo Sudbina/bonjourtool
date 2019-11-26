@@ -60,6 +60,7 @@
     "firebase": "^7.5.0",
     "lodash": "^4.17.15",
     "mdns-js": "^1.0.3",
+    "uniqid": "^5.1.0",
     "vue": "^2.5.16",
     "vue-analytics": "^5.18.0",
     "vue-animejs": "^2.1.1",

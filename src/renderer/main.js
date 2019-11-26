@@ -29,6 +29,9 @@ Vue.config.productionTip = false
 import _ from 'lodash';    
 Vue.lodash = Vue.prototype.$lodash = _
 
+import uniqid from 'uniqid';
+Vue.uniqid = Vue.prototype.$uniqid = uniqid
+
 /* eslint-disable no-new */
 new Vue({
   components: { App },

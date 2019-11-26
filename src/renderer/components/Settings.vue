@@ -92,7 +92,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this.$cookies.get("userThemePref"));
+    console.log(this.$uniqid('ebonjourUser-'));
   },
   computed: {
     computedSavedDevices() {
@@ -143,7 +143,10 @@ export default {
       console.log("[VX] CHANGE THEME: ", theme);
       store.dispatch("handleUserThemeChange", theme).then(() => {
         this.$cookies.set("userThemePref", theme);
-        Sentry.captureMessage('Cookies set for userThemePref', 'debug');
+        Sentry.withScope((scope) => {
+            scope.setExtra('theme', theme);
+            Sentry.captureMessage('Cookies set for userThemePref', 'debug');
+        })
         console.log(this.$cookies.get("userThemePref"));
       });
     },
