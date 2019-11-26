@@ -1,5 +1,9 @@
 <template>
-  <div class="ebonjour-wrapper" :style="`background: ${themeBackground}; color: ${themeText}`" v-anime="{ opacity: 1, duration: 1000 }">
+  <div
+    class="ebonjour-wrapper"
+    :style="`background: ${themeBackground}; color: ${themeText}`"
+    v-anime="{ opacity: 1, duration: 1000 }"
+  >
     <div class="navigator" :style="`background: ${themeNavigatorBackground}`">
       <a-select
         showSearch
@@ -36,6 +40,7 @@
         <a-collapse-panel
           v-anime="listAnimation"
           v-for="(device, key) in discoveredDevices"
+          data-test="test"
           :header="device.name + '(' + device.port + ')'"
           v-bind:key="'ebonjour-resultitem-' + key"
         >
@@ -78,7 +83,13 @@
               <strong style="text-transform: capitalize;">{{ key }}: </strong
               >{{ val }}
             </a-tag>
-            <a-button type="primary" size="small" style="font-weight: bold;" @click="handleRememberDevice(device)">Remember</a-button>
+            <a-button
+              type="primary"
+              size="small"
+              style="font-weight: bold;"
+              @click="handleRememberDevice(device)"
+              >Remember</a-button
+            >
           </div>
         </a-collapse-panel>
       </a-collapse>
@@ -87,7 +98,7 @@
 </template>
 
 <script>
-import store from '../store';
+import store from "../store";
 import Bonjour from "bonjour";
 import _ from "lodash";
 import serviceTypes from "./Browser/mdnsServiceTypes";
@@ -103,11 +114,13 @@ export default {
       logs: true,
       statusText: "Scanning",
       serviceTypes: serviceTypes,
-      testArr: this.$cookies.get("savedDevices") ? this.$cookies.get("savedDevices") : [],
+      savedDevices: this.$cookies.get("savedDevices")
+        ? this.$cookies.get("savedDevices")
+        : [],
       listAnimation: { duration: 2000, opacity: 1 },
       selectedServiceType: this.$cookies.get("serviceTypePref")
-                            ? this.$cookies.get("serviceTypePref")
-                            : "",
+        ? this.$cookies.get("serviceTypePref")
+        : ""
     };
   },
   mounted() {
@@ -154,10 +167,23 @@ export default {
   },
   methods: {
     handleRememberDevice(device) {
-      this.testArr.devices.push(device);
-      this.$cookies.set("savedDevices", this.testArr);
-      console.log("DEVICES", this.$cookies.get("savedDevices"));
-      store.dispatch('updateSavedDevices', this.$cookies.get("savedDevices"))
+      if (!this.$lodash.includes(this.savedDevices.devices, device)) {
+        this.savedDevices.devices.push(device);
+        this.$cookies.set("savedDevices", this.savedDevices);
+        console.log("DEVICES", this.$cookies.get("savedDevices"));
+        store.dispatch("updateSavedDevices", this.$cookies.get("savedDevices"));
+        this.$notification.open({
+          message: "Device remembered!",
+          placement: "bottomRight",
+          duration: 2.5
+        })
+      } else {
+        this.$notification.open({
+          message: "Already saved this device",
+          placement: "bottomRight",
+          duration: 2.5
+        });
+      }
     },
     handleNavigation(screen) {
       this.$router.push(screen);

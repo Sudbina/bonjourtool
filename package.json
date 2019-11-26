@@ -51,6 +51,9 @@
     }
   },
   "dependencies": {
+    "@sentry/browser": "^5.9.1",
+    "@sentry/electron": "1.0.0",
+    "@sentry/integrations": "^5.8.0",
     "ant-design-vue": "^1.4.4",
     "axios": "^0.18.0",
     "bonjour": "^3.5.0",
