@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "ant-design-vue": "^1.4.4",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "bonjour": "^3.5.0",
     "lodash": "^4.17.15",
     "mdns-js": "^1.0.3",
