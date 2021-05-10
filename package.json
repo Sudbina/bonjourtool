@@ -54,7 +54,7 @@
     "ant-design-vue": "^1.4.4",
     "axios": "^0.18.0",
     "bonjour": "^3.5.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "mdns-js": "^1.0.3",
     "vue": "^2.5.16",
     "vue-animejs": "^2.1.1",
